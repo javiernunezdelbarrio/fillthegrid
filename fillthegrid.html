@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Trivia de Películas</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background-color: #111;
+      color: #fff;
+      padding: 20px;
+    }
+
+    h1 {
+      text-align: center;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .cell {
+      background: #222;
+      border-radius: 10px;
+      padding: 15px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.5);
+    }
+
+    .question {
+      margin-bottom: 10px;
+      font-size: 0.95rem;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 10px;
+      font-size: 1rem;
+      border: none;
+      border-radius: 5px;
+    }
+
+    .correct {
+      background-color: #2e7d32 !important;
+      color: white;
+    }
+
+    .incorrect {
+      background-color: #c62828 !important;
+      color: white;
+    }
+
+    #complete-message {
+      text-align: center;
+      font-size: 1.2rem;
+      margin-top: 20px;
+      display: none;
+      color: #4caf50;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Trivia de Películas</h1>
+  <h6>Escribe todo en minúsculas</h6>
+
+  <div class="grid" id="grid">
+    <!-- Celdas generadas dinámicamente -->
+  </div>
+
+  <div id="complete-message">¡Has respondido todo correctamente!</div>
+
+  <script>
+   const preguntas = [
+  { id: "0-0", texto: "¿Nombre del padre de Luke Skywalker?", respuesta: "darth vader" },
+  { id: "0-1", texto: "¿Dónde vive Frodo al inicio de la saga?", respuesta: "la comarca" },
+  { id: "0-2", texto: "¿Nombre del dragón en El Hobbit?", respuesta: "smaug" },
+  { id: "1-0", texto: "¿Actor que interpreta a Mr. Bean?", respuesta: "rowan atkinson" },
+  { id: "1-1", texto: "¿Apellido de la familia en El Padrino?", respuesta: "corleone" },
+  { id: "2-0", texto: "¿Planeta natal de Luke Skywalker?", respuesta: "tatooine" },
+  { id: "2-1", texto: "¿Nombre del mago blanco en El Señor de los Anillos?", respuesta: "saruman" },
+  { id: "2-2", texto: "¿Nombre del actor de Indiana Jones?", respuesta: "harrison ford" },
+  { id: "3-0", texto: "¿Película con un animal gigante de Spielberg?", respuesta: "tiburón" },
+  { id: "3-1", texto: "¿País donde transcurre Casablanca?", respuesta: "marruecos" },
+  { id: "3-2", texto: "¿Nombre del mago que ayuda a Bilbo?", respuesta: "gandalf" },
+  { id: "4-0", texto: "¿Nombre del hobbit protagonista de El Hobbit?", respuesta: "bilbo" },
+  { id: "4-1", texto: "¿Película con frase: 'que la fuerza te acompañe'?", respuesta: "star wars" },
+  { id: "4-2", texto: "¿Animal de peluche favorito de Mr. Bean?", respuesta: "teddy" },
+  { id: "5-0", texto: "¿Frase de El Padrino: 'Le haré una oferta...'", respuesta: "que no podrá rechazar" },
+  { id: "5-1", texto: "¿Nombre del espía 007?", respuesta: "james bond" },
+  { id: "5-2", texto: "¿Película donde aparece el personaje Balboa?", respuesta: "rocky" },
+  { id: "6-0", texto: "¿Película animada con juguetes que hablan?", respuesta: "toy story" },
+  { id: "6-1", texto: "¿Número de película donde sale el personaje Darth Maul?", respuesta: "1" },
+  { id: "6-2", texto: "¿Robot pequeño que limpia la Tierra?", respuesta: "wall-e" },
+];
+
+
+    const grid = document.getElementById('grid');
+
+    preguntas.forEach(p => {
+      const cell = document.createElement('div');
+      cell.classList.add('cell');
+
+      const label = document.createElement('div');
+      label.classList.add('question');
+      label.textContent = p.texto;
+
+      const input = document.createElement('input');
+      input.type = "text";
+      input.dataset.respuesta = p.respuesta;
+
+      input.addEventListener('keydown', (e) => {
+        if (e.key === "Enter") {
+          const valor = input.value.trim().toLowerCase();
+          if (valor === input.dataset.respuesta) {
+            input.classList.add('correct');
+            input.classList.remove('incorrect');
+          } else {
+            input.classList.add('incorrect');
+            input.classList.remove('correct');
+          }
+
+          // Verifica si todas las respuestas están correctas
+          const todosCorrectos = [...document.querySelectorAll("input")].every(inp =>
+            inp.value.trim().toLowerCase() === inp.dataset.respuesta
+          );
+
+          document.getElementById("complete-message").style.display = todosCorrectos ? "block" : "none";
+        }
+      });
+
+      cell.appendChild(label);
+      cell.appendChild(input);
+      grid.appendChild(cell);
+    });
+  </script>
+</body>
+</html>
