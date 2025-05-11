@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tragamonedas</title>
+  <style>
+    body {
+      background-color: #0f0f0f;
+      color: #fff;
+      font-family: 'Segoe UI', sans-serif;
+      text-align: center;
+      padding: 50px;
+    }
+    .slot {
+      font-size: 5rem;
+      margin: 30px 0;
+    }
+    .result {
+      margin-top: 20px;
+      font-weight: bold;
+    }
+    .money {
+      margin: 15px 0;
+    }
+    button {
+      background-color: #fca311;
+      border: none;
+      padding: 10px 20px;
+      font-size: 1.2rem;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Tragamonedas</h1>
+  <div class="money">Dinero disponible: <span id="money"></span> €</div>
+  <div class="slot" id="slotDisplay">🍒 🍋 🍊</div>
+  <button id="spinBtn">Girar</button>
+  <div class="result" id="result"></div>
+
+  <script>
+    const symbols = ['🍒', '🍋', '🍊', '🍉', '⭐', '🔔'];
+    let money = parseInt(localStorage.getItem('money')) || 2000;
+    document.getElementById('money').textContent = money;
+
+    document.getElementById('spinBtn').addEventListener('click', () => {
+      if (money < 100) {
+        alert("No tienes suficiente dinero para jugar.");
+        return;
+      }
+
+      money -= 100;
+      const s1 = symbols[Math.floor(Math.random() * symbols.length)];
+      const s2 = symbols[Math.floor(Math.random() * symbols.length)];
+      const s3 = symbols[Math.floor(Math.random() * symbols.length)];
+
+      document.getElementById('slotDisplay').textContent = `${s1} ${s2} ${s3}`;
+
+      if (s1 === s2 && s2 === s3) {
+        money += 1000;
+        document.getElementById('result').textContent = '¡Triple! Ganaste 1000€!';
+      } else if (s1 === s2 || s1 === s3 || s2 === s3) {
+        money += 250;
+        document.getElementById('result').textContent = '¡Doble! Ganaste 250€!';
+      } else {
+        document.getElementById('result').textContent = 'Intenta de nuevo';
+      }
+
+      localStorage.setItem('money', money);
+      document.getElementById('money').textContent = money;
+    });
+  </script>
+</body>
+</html>

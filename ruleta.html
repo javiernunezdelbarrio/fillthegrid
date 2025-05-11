@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ruleta</title>
+  <style>
+    body {
+      background-color: #0f0f0f;
+      color: #fff;
+      font-family: 'Segoe UI', sans-serif;
+      text-align: center;
+      padding: 50px;
+    }
+    .number {
+      font-size: 4rem;
+      margin: 30px 0;
+    }
+    .money {
+      margin: 15px 0;
+    }
+    button {
+      background-color: #fca311;
+      border: none;
+      padding: 10px 20px;
+      font-size: 1.2rem;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Ruleta</h1>
+  <div class="money">Dinero disponible: <span id="money"></span> €</div>
+  <p>Apuesta por un número entre 0 y 36</p>
+  <input type="number" id="betNumber" min="0" max="36">
+  <button id="spinBtn">Girar</button>
+  <div class="number" id="rouletteNumber">-</div>
+  <div id="rouletteResult"></div>
+
+  <script>
+    let money = parseInt(localStorage.getItem('money')) || 2000;
+    document.getElementById('money').textContent = money;
+
+    document.getElementById('spinBtn').addEventListener('click', () => {
+      const userNumber = parseInt(document.getElementById('betNumber').value);
+      if (isNaN(userNumber) || userNumber < 0 || userNumber > 36) {
+        alert("Introduce un número válido entre 0 y 36.");
+        return;
+      }
+      if (money < 100) {
+        alert("No tienes suficiente dinero para jugar.");
+        return;
+      }
+
+      money -= 100;
+      const result = Math.floor(Math.random() * 37);
+      document.getElementById('rouletteNumber').textContent = result;
+
+      if (userNumber === result) {
+        const winnings = 3600;
+        money += winnings;
+        document.getElementById('rouletteResult').textContent = `¡Ganaste ${winnings}€!`;
+      } else {
+        document.getElementById('rouletteResult').textContent = 'Perdiste, intenta otra vez';
+      }
+
+      localStorage.setItem('money', money);
+      document.getElementById('money').textContent = money;
+    });
+  </script>
+</body>
+</html>

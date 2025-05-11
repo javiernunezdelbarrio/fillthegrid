@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Blackjack</title>
+  <style>
+    body {
+      background-color: #0f0f0f;
+      color: #fff;
+      font-family: 'Segoe UI', sans-serif;
+      text-align: center;
+      padding: 50px;
+    }
+    .cards {
+      font-size: 2rem;
+      margin: 20px 0;
+    }
+    .money {
+      margin: 15px 0;
+    }
+    button {
+      background-color: #fca311;
+      border: none;
+      padding: 10px 20px;
+      font-size: 1.2rem;
+      cursor: pointer;
+      border-radius: 5px;
+      margin: 5px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Blackjack</h1>
+  <div class="money">Dinero disponible: <span id="money"></span> €</div>
+  <div class="cards" id="playerCards">Jugador: </div>
+  <div class="cards" id="dealerCards">Crupier: </div>
+  <div id="blackjackResult"></div>
+  <button id="newGame">Nueva partida</button>
+  <button id="hit">Pedir carta</button>
+  <button id="stand">Plantarse</button>
+
+  <script>
+    let money = parseInt(localStorage.getItem('money')) || 2000;
+    let player = [], dealer = [], gameStarted = false;
+    document.getElementById('money').textContent = money;
+
+    function drawCard() {
+      return Math.floor(Math.random() * 10) + 1;
+    }
+
+    function updateDisplay(showDealer = false) {
+      document.getElementById('playerCards').textContent = 'Jugador: ' + player.join(', ') + ' = ' + player.reduce((a, b) => a + b, 0);
+      if (showDealer) {
+        document.getElementById('dealerCards').textContent = 'Crupier: ' + dealer.join(', ') + ' = ' + dealer.reduce((a, b) => a + b, 0);
+      } else {
+        document.getElementById('dealerCards').textContent = 'Crupier: ' + dealer[0] + ', ?';
+      }
+    }
+
+    document.getElementById('newGame').addEventListener('click', () => {
+      if (money < 100) {
+        alert("No tienes suficiente dinero para jugar.");
+        return;
+      }
+      money -= 100;
+      player = [drawCard(), drawCard()];
+      dealer = [drawCard(), drawCard()];
+      gameStarted = true;
+      updateDisplay();
+      document.getElementById('blackjackResult').textContent = '';
+      document.getElementById('money').textContent = money;
+      localStorage.setItem('money', money);
+    });
+
+    document.getElementById('hit').addEventListener('click', () => {
+      if (!gameStarted) return;
+      player.push(drawCard());
+      updateDisplay();
+      const total = player.reduce((a, b) => a + b, 0);
+      if (total > 21) {
+        document.getElementById('blackjackResult').textContent = 'Te pasaste. Pierdes.';
+        gameStarted = false;
+        localStorage.setItem('money', money);
+      }
+    });
+
+    document.getElementById('stand').addEventListener('click', () => {
+      if (!gameStarted) return;
+      while (dealer.reduce((a, b) => a + b, 0) < 17) {
+        dealer.push(drawCard());
+      }
+      const playerTotal = player.reduce((a, b) => a + b, 0);
+      const dealerTotal = dealer.reduce((a, b) => a + b, 0);
+      updateDisplay(true);
+
+      let result = '';
+      if (dealerTotal > 21 || playerTotal > dealerTotal) {
+        result = '¡Ganaste 500€!';
+        money += 500;
+      } else if (playerTotal < dealerTotal) {
+        result = 'Perdiste.';
+      } else {
+        result = 'Empate.';
+        money += 100;
+      }
+
+      document.getElementById('blackjackResult').textContent = result;
+      document.getElementById('money').textContent = money;
+      localStorage.setItem('money', money);
+      gameStarted = false;
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Casino Royale</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #0f0f0f;
+      color: #fff;
+    }
+
+    header {
+      background: linear-gradient(90deg, #9d0208, #d00000);
+      padding: 20px;
+      text-align: center;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 2.5rem;
+      letter-spacing: 2px;
+    }
+
+    .hero {
+      background-image: url('https://theolivepress.es/wp-content/uploads/2019/04/casino-scene.jpg');
+      background-size: cover;
+      background-position: center;
+      padding: 100px 20px;
+      text-align: center;
+    }
+
+    .games {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 20px;
+      padding: 40px;
+      background-color: #121212;
+    }
+
+    .game-card {
+      background-color: #1f1f1f;
+      border-radius: 10px;
+      padding: 20px;
+      text-align: center;
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.05);
+    }
+
+    .game-card img {
+      max-width: 100%;
+      border-radius: 8px;
+    }
+
+    .game-card h3 {
+      margin: 15px 0 10px;
+    }
+
+    footer {
+      background-color: #1e1e1e;
+      text-align: center;
+      padding: 20px;
+      font-size: 0.9rem;
+      color: #aaa;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Casino</h1>
+  </header>
+
+  <section class="hero">
+    <h2>¡Bienvenido al mejor casino online!</h2>
+  </section>
+
+  <section class="games">
+    <div class="game-card">
+      <h3>Tragamonedas</h3>
+       <a href="tragamonedas.html">Jugar</a>
+    </div>
+    <div class="game-card">
+      <h3>Ruleta</h3>
+      <a href="ruleta.html">Jugar</a>
+    </div>
+    <div class="game-card">
+      <h3>Blackjack</h3>
+      <a href="blackjack.html">Jugar</a>
+    </div>
+  </section>
+
+</body>
+</html>
