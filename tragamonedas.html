@@ -30,6 +30,7 @@
       font-size: 1.2rem;
       cursor: pointer;
       border-radius: 5px;
+      margin: 10px;
     }
   </style>
 </head>
@@ -38,6 +39,7 @@
   <div class="money">Dinero disponible: <span id="money"></span> €</div>
   <div class="slot" id="slotDisplay">🍒 🍋 🍊</div>
   <button id="spinBtn">Girar</button>
+  <button id="resetBtn">Reiniciar Dinero</button>
   <div class="result" id="result"></div>
 
   <script>
@@ -70,6 +72,13 @@
 
       localStorage.setItem('money', money);
       document.getElementById('money').textContent = money;
+    });
+
+    document.getElementById('resetBtn').addEventListener('click', () => {
+      money = 2000;
+      localStorage.setItem('money', money);
+      document.getElementById('money').textContent = money;
+      document.getElementById('result').textContent = 'Dinero reiniciado a 2000€';
     });
   </script>
 </body>

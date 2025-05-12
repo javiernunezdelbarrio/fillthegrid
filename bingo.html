@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Bingo</title>
+  <style>
+    body { font-family: Arial, sans-serif; text-align: center; }
+    table { margin: 0 auto; border-collapse: collapse; }
+    td { width: 50px; height: 50px; border: 1px solid #000; font-size: 20px; text-align: center; }
+    .marked { background-color: yellow; }
+  </style>
+</head>
+<body>
+  <h1>Bingo</h1>
+  <table id="bingo"></table>
+  <p id="called">Número: </p>
+  <button onclick="callNumber()">Siguiente número</button>
+
+  <script>
+    const bingo = document.getElementById('bingo');
+    const called = document.getElementById('called');
+    const numbers = Array.from({length: 75}, (_, i) => i + 1);
+    let card = [];
+
+    function generateCard() {
+      card = [];
+      for (let i = 0; i < 5; i++) {
+        card[i] = [];
+        for (let j = 0; j < 5; j++) {
+          let num;
+          do {
+            num = Math.floor(Math.random() * 75) + 1;
+          } while (card.flat().includes(num));
+          card[i][j] = num;
+        }
+      }
+      card[2][2] = '★'; // Free space
+    }
+
+    function renderCard() {
+      bingo.innerHTML = '';
+      for (let i = 0; i < 5; i++) {
+        const row = document.createElement('tr');
+        for (let j = 0; j < 5; j++) {
+          const cell = document.createElement('td');
+          cell.textContent = card[i][j];
+          row.appendChild(cell);
+        }
+        bingo.appendChild(row);
+      }
+    }
+
+    function callNumber() {
+      if (numbers.length === 0) {
+        called.textContent = 'Todos los números han sido llamados.';
+        return;
+      }
+      const index = Math.floor(Math.random() * numbers.length);
+      const number = numbers.splice(index, 1)[0];
+      called.textContent = `Número llamado: ${number}`;
+      for (let i = 0; i < 5; i++) {
+        for (let j = 0; j < 5; j++) {
+          if (card[i][j] === number) {
+            bingo.rows[i].cells[j].classList.add('marked');
+          }
+        }
+      }
+    }
+
+    generateCard();
+    renderCard();
+  </script>
+</body>
+</html>

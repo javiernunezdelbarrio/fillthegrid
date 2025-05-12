@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Ruleta de la Fortuna</title>
+  <style>
+    body { font-family: Arial, sans-serif; text-align: center; }
+    #wheel { font-size: 50px; margin: 20px; }
+  </style>
+</head>
+<body>
+  <h1>Ruleta de la Fortuna</h1>
+  <div id="wheel">🎁</div>
+  <p id="result">Haz clic en "Girar" para obtener un premio.</p>
+  <button onclick="spinWheel()">Girar</button>
+
+  <script>
+    const prizes = ['🎉', '💰', '🚗', '🏖️', '📱', '🎮'];
+    function spinWheel() {
+      const prize = prizes[Math.floor(Math.random() * prizes.length)];
+      document.getElementById('wheel').textContent = prize;
+      document.getElementById('result').textContent = `¡Ganaste ${prize}!`;
+    }
+  </script>
+</body>
+</html>

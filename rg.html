@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Rasca y Gana</title>
+  <style>
+    body { font-family: Arial, sans-serif; text-align: center; }
+    .grid { display: grid; grid-template-columns: repeat(3, 100px); gap: 10px; justify-content: center; }
+    .card { width: 100px; height: 100px; background: gray; font-size: 50px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <h1>Rasca y Gana</h1>
+  <div class="grid" id="grid"></div>
+  <p id="result">Haz clic en las tarjetas para revelar los símbolos.</p>
+  <button onclick="initGame()">Reiniciar</button>
+
+  <script>
+    const symbols = ['🍒', '🍋', '🍊', '🍉', '⭐', '🔔'];
+    let revealed = [];
+
+    function initGame() {
+      const grid = document.getElementById('grid');
+      grid.innerHTML = '';
+      revealed = [];
+      for (let i = 0; i < 9; i++) {
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.dataset.index = i;
+        card.addEventListener('click', revealCard);
+        grid.appendChild(card);
+      }
+      document.getElementById('result').textContent = 'Haz clic en las tarjetas para revelar los símbolos.';
+    }
+
+    function revealCard(e) {
+      const card = e.target;
+      if (card.textContent !== '') return;
+      const symbol = symbols[Math.floor(Math.random() * symbols.length)];
+      card.textContent = symbol;
+      revealed.push(symbol);
+      if (revealed.length === 9) {
+        const counts = {};
+        revealed.forEach(s => counts[s] = (counts[s] || 0) + 1);
+        const max = Math.max(...Object.values(counts));
+        if (max >= 3) {
+          document.getElementById('result').textContent = '¡Ganaste!';
+        } else {
+          document.getElementById('result').textContent = 'Intenta de nuevo.';
+        }
+      }
+    }
+
+    initGame();
+  </script>
+</body>
+</html>

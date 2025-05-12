@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Juego de Dados</title>
+  <style>
+    body {
+      background-color: #0f0f0f;
+      color: white;
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 30px;
+    }
+    #dice {
+      font-size: 60px;
+      margin: 20px;
+    }
+    select, input, button {
+      margin: 10px;
+      padding: 8px;
+      font-size: 16px;
+    }
+    .money-info {
+      margin: 20px 0;
+    }
+  </style>
+</head>
+<body>
+  <h1>Juego de Dados</h1>
+
+  <div class="money-info">
+    Dinero disponible: <span id="money"></span> €
+  </div>
+
+  <label for="betType">Tipo de apuesta:</label>
+  <select id="betType" onchange="toggleNumberInput()">
+    <option value="par">Par</option>
+    <option value="impar">Impar</option>
+    <option value="mayor">Mayor que...</option>
+    <option value="menor">Menor que...</option>
+    <option value="numero">Número exacto</option>
+  </select>
+
+  <div id="numberInput" style="display:none;">
+    <label for="number">Introduce número:</label>
+    <input type="number" id="number" min="2" max="12">
+  </div>
+
+  <button onclick="rollDice()">Lanzar Dados</button>
+
+  <div id="dice">🎲 🎲</div>
+  <div id="result"></div>
+
+  <button onclick="resetMoney()">Reiniciar Dinero</button>
+
+  <script>
+    let money = parseInt(localStorage.getItem('money')) || 2000;
+
+    function updateDisplay() {
+      document.getElementById('money').textContent = money;
+    }
+
+    function toggleNumberInput() {
+      const type = document.getElementById('betType').value;
+      const numberInput = document.getElementById('numberInput');
+      numberInput.style.display = ['mayor', 'menor', 'numero'].includes(type) ? 'inline-block' : 'none';
+    }
+
+    function rollDice() {
+      if (money < 50) {
+        alert("No tienes suficiente dinero para jugar.");
+        return;
+      }
+
+      const betType = document.getElementById('betType').value;
+      const numberValue = parseInt(document.getElementById('number').value);
+      const validInput = ['mayor', 'menor', 'numero'].includes(betType) ? !isNaN(numberValue) && numberValue >= 2 && numberValue <= 12 : true;
+
+      if (!validInput) {
+        alert("Introduce un número válido entre 2 y 12.");
+        return;
+      }
+
+      money -= 50;
+
+      const d1 = Math.floor(Math.random() * 6) + 1;
+      const d2 = Math.floor(Math.random() * 6) + 1;
+      const sum = d1 + d2;
+
+      document.getElementById('dice').textContent = `🎲${d1} 🎲${d2}`;
+      let winnings = 0;
+      let msg = `Sacaste ${sum}. `;
+
+      if (betType === 'par' && sum % 2 === 0) {
+        winnings = 100;
+        msg += "¡Ganaste con Par!";
+      } else if (betType === 'impar' && sum % 2 !== 0) {
+        winnings = 100;
+        msg += "¡Ganaste con Impar!";
+      } else if (betType === 'mayor' && sum > numberValue) {
+        winnings = 150;
+        msg += `¡Ganaste! ${sum} es mayor que ${numberValue}`;
+      } else if (betType === 'menor' && sum < numberValue) {
+        winnings = 150;
+        msg += `¡Ganaste! ${sum} es menor que ${numberValue}`;
+      } else if (betType === 'numero' && sum === numberValue) {
+        winnings = 3000;
+        msg += `¡Exacto! Has acertado ${numberValue}`;
+      } else {
+        msg += "No ganaste esta vez.";
+      }
+
+      money += winnings;
+      localStorage.setItem('money', money);
+      updateDisplay();
+      document.getElementById('result').textContent = msg;
+    }
+
+    function resetMoney() {
+      money = 2000;
+      localStorage.setItem('money', money);
+      updateDisplay();
+      document.getElementById('result').textContent = "Dinero reiniciado a 2000€";
+    }
+
+    updateDisplay();
+  </script>
+</body>
+</html>

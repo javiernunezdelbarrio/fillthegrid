@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Carrera de Caballos</title>
+  <style>
+    body {
+      background: #0f0f0f;
+      color: white;
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 20px;
+    }
+
+    .track {
+      position: relative;
+      height: 200px;
+      margin: 40px auto;
+      width: 90%;
+      border: 2px solid #fff;
+      background-color: green ;
+    }
+
+    .horse {
+      position: absolute;
+      top: 0;
+      font-size: 2rem;
+      transition: left 0.2s;
+    }
+
+    .horse:nth-child(2) { top: 60px; }
+    .horse:nth-child(3) { top: 120px; }
+    .horse:nth-child(4) { top: 180px; }
+
+    select, button {
+      margin: 10px;
+      padding: 10px;
+      font-size: 1rem;
+    }
+
+    #result {
+      margin-top: 20px;
+      font-size: 1.2rem;
+    }
+  </style>
+</head>
+<body>
+  <h1>🏇 Carrera de Caballos</h1>
+
+  <div>Dinero disponible: <span id="money"></span> €</div>
+
+  <label for="betHorse">Elige tu caballo (1-4):</label>
+  <select id="betHorse">
+    <option value="1">Caballo 1</option>
+    <option value="2">Caballo 2</option>
+    <option value="3">Caballo 3</option>
+    <option value="4">Caballo 4</option>
+  </select>
+
+  <button onclick="startRace()">Iniciar Carrera</button>
+  <button onclick="resetMoney()">Reiniciar Dinero</button>
+
+  <div class="track">
+    <div class="horse" id="horse1">🐎</div>
+    <div class="horse" id="horse2">🐎</div>
+    <div class="horse" id="horse3">🐎</div>
+    <div class="horse" id="horse4">🐎</div>
+  </div>
+
+  <div id="result"></div>
+
+  <script>
+    let money = parseInt(localStorage.getItem('money')) || 2000;
+    const horses = [document.getElementById('horse1'), document.getElementById('horse2'), document.getElementById('horse3'), document.getElementById('horse4')];
+    const trackWidth = 1075;
+
+    function updateDisplay() {
+      document.getElementById('money').textContent = money;
+    }
+
+    function resetMoney() {
+      money = 2000;
+      localStorage.setItem('money', money);
+      updateDisplay();
+      document.getElementById('result').textContent = "Dinero reiniciado a 2000€";
+    }
+
+    function startRace() {
+      if (money < 100) {
+        alert("No tienes suficiente dinero para apostar.");
+        return;
+      }
+
+      const chosen = parseInt(document.getElementById('betHorse').value);
+      money -= 100;
+      updateDisplay();
+      localStorage.setItem('money', money);
+      document.getElementById('result').textContent = "¡La carrera ha comenzado!";
+
+      // Reset posiciones
+      horses.forEach(h => h.style.left = '0px');
+
+      const positions = [0, 0, 0, 0];
+      const interval = setInterval(() => {
+        let winner = null;
+        for (let i = 0; i < horses.length; i++) {
+          const move = Math.random() * 20;
+          positions[i] += move;
+          horses[i].style.left = `${positions[i]}px`;
+          if (positions[i] >= trackWidth) {
+            winner = i + 1;
+            clearInterval(interval);
+            if (winner === chosen) {
+              money += 400;
+              document.getElementById('result').textContent = `¡Ganó el Caballo ${winner}! ¡Ganaste 400 €!`;
+            } else {
+              document.getElementById('result').textContent = `Ganó el Caballo ${winner}. No ganaste esta vez.`;
+            }
+            localStorage.setItem('money', money);
+            updateDisplay();
+            break;
+          }
+        }
+      }, 100);
+    }
+
+    updateDisplay();
+  </script>
+</body>
+</html>
