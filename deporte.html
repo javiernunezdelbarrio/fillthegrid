@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Apuestas Deportivas - Fútbol Real</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #121212;
+      color: white;
+      text-align: center;
+      padding: 20px;
+    }
+
+    select, button {
+      padding: 10px;
+      font-size: 1.2rem;
+      margin: 10px;
+      cursor: pointer;
+    }
+
+    .match-info {
+      margin: 20px;
+      font-size: 1.2rem;
+    }
+
+    #result {
+      margin-top: 20px;
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
+
+    .money-info {
+      margin: 20px;
+      font-size: 1.2rem;
+    }
+
+    .time-info {
+      margin-top: 30px;
+      font-size: 1.2rem;
+    }
+
+    #startBtn {
+      background-color: #4caf50;
+    }
+
+    #resetBtn {
+      background-color: #f44336;
+    }
+
+    .team {
+      font-size: 1.3rem;
+    }
+  </style>
+</head>
+<body>
+  <h1>Apuestas Deportivas de Fútbol</h1>
+
+  <div class="money-info">
+    Dinero disponible: <span id="money"></span> €
+  </div>
+
+  <div class="match-info">
+    <label for="team">Elige un partido:</label>
+    <select id="team">
+      <option value="1">FC Barcelona vs Real Madrid</option>
+      <option value="2">Manchester City vs Liverpool</option>
+      <option value="3">Juventus vs AC Milan</option>
+      <option value="4">Bayern Munich vs Borussia Dortmund</option>
+      <option value="5">Paris Saint-Germain vs Marseille</option>
+      <option value="6">Chelsea vs Arsenal</option>
+    </select>
+  </div>
+
+  <div>
+    <label for="bet">Apuesta por:</label>
+    <select id="bet">
+      <option value="equipoA">Equipo A</option>
+      <option value="equipoB">Equipo B</option>
+      <option value="empate">Empate</option>
+    </select>
+  </div>
+
+  <div class="time-info">
+    <label for="time">Horario del partido:</label>
+    <input type="time" id="time" value="14:00" />
+    <button id="startBtn">Iniciar Apuesta</button>
+  </div>
+
+  <div id="result"></div>
+
+  <button id="resetBtn">Reiniciar Dinero</button>
+
+  <script>
+    let money = parseInt(localStorage.getItem('money')) || 2000;
+
+    // Equipos de fútbol reales
+    const teams = [
+      { id: 1, nameA: "FC Barcelona", nameB: "Real Madrid" },
+      { id: 2, nameA: "Manchester City", nameB: "Liverpool" },
+      { id: 3, nameA: "Juventus", nameB: "AC Milan" },
+      { id: 4, nameA: "Bayern Munich", nameB: "Borussia Dortmund" },
+      { id: 5, nameA: "Paris Saint-Germain", nameB: "Marseille" },
+      { id: 6, nameA: "Chelsea", nameB: "Arsenal" },
+    ];
+
+    // Función para obtener la fecha actual
+    function getCurrentDate() {
+      return new Date().toISOString().split('T')[0];  // Devuelve la fecha en formato "YYYY-MM-DD"
+    }
+
+    // Función para actualizar los partidos cada 24 horas
+    function checkForDailyUpdate() {
+      const lastUpdateDate = localStorage.getItem('lastUpdateDate');
+      const currentDate = getCurrentDate();
+
+      if (!lastUpdateDate || lastUpdateDate !== currentDate) {
+        // Si no ha habido actualización hoy, o es el primer día, actualizamos los partidos
+        localStorage.setItem('lastUpdateDate', currentDate);
+        localStorage.setItem('matchesUpdated', true); // Esto puede ser usado para otras actualizaciones si fuera necesario
+      }
+    }
+
+    // Actualiza la pantalla con el dinero disponible
+    function updateDisplay() {
+      document.getElementById('money').textContent = money;
+    }
+
+    // Reiniciar el dinero
+    function resetMoney() {
+      money = 2000;
+      localStorage.setItem('money', money);
+      updateDisplay();
+      document.getElementById('result').textContent = "Dinero reiniciado a 2000€";
+    }
+
+    // Generación de resultados aleatorios pero realistas
+    function generateMatchResult() {
+      const randomOutcome = Math.random();
+      let result = '';
+
+      // 40% de probabilidad de empate
+      if (randomOutcome < 0.4) {
+        result = 'Empate';
+      }
+      // 30% de probabilidad de victoria del equipo A
+      else if (randomOutcome < 0.7) {
+        result = 'Victoria del Equipo A';
+      }
+      // 30% de probabilidad de victoria del equipo B
+      else {
+        result = 'Victoria del Equipo B';
+      }
+
+      return result;
+    }
+
+    // Función para simular el inicio del partido y el resultado
+    function startMatch() {
+      const matchTime = document.getElementById('time').value;
+      const selectedTeam = parseInt(document.getElementById('team').value);
+      const selectedBet = document.getElementById('bet').value;
+
+      const match = teams[selectedTeam - 1]; // Obtener el partido seleccionado
+      const matchResult = generateMatchResult();
+      const currentTime = new Date();
+      const matchTimeObject = new Date();
+      const [hours, minutes] = matchTime.split(':');
+      matchTimeObject.setHours(hours, minutes, 0);
+
+      // Si la hora actual es la hora del partido o posterior
+      if (currentTime >= matchTimeObject) {
+        const betResult = checkBetResult(matchResult, selectedBet, match);
+        updateDisplay();
+        document.getElementById('result').textContent = `Resultado del partido: ${matchResult}. ${betResult}`;
+
+        // Actualizamos el dinero en localStorage
+        localStorage.setItem('money', money);
+      } else {
+        document.getElementById('result').textContent = `El partido está programado para: ${matchTime}.`;
+      }
+    }
+
+    // Verifica si la apuesta fue correcta y actualiza el dinero
+    function checkBetResult(matchResult, selectedBet, match) {
+      if (matchResult === 'Empate' && selectedBet === 'empate') {
+        money += 100; // Ganar apuesta en empate
+        return `¡Ganaste tu apuesta! Empate en el partido entre ${match.nameA} y ${match.nameB}.`;
+      } else if (matchResult === 'Victoria del Equipo A' && selectedBet === 'equipoA') {
+        money += 200; // Ganar apuesta en victoria equipo A
+        return `¡Ganaste tu apuesta! Victoria del ${match.nameA}.`;
+      } else if (matchResult === 'Victoria del Equipo B' && selectedBet === 'equipoB') {
+        money += 200; // Ganar apuesta en victoria equipo B
+        return `¡Ganaste tu apuesta! Victoria del ${match.nameB}.`;
+      } else {
+        money -= 100; // Perder la apuesta
+        return `Perdiste tu apuesta en el partido entre ${match.nameA} y ${match.nameB}.`;
+      }
+    }
+
+    // Iniciar la apuesta
+    document.getElementById('startBtn').addEventListener('click', startMatch);
+
+    // Reiniciar dinero
+    document.getElementById('resetBtn').addEventListener('click', resetMoney);
+
+    // Inicializar el dinero
+    updateDisplay();
+
+    // Verificamos si es necesario hacer una actualización diaria
+    checkForDailyUpdate();
+  </script>
+</body>
+</html>
