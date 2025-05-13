@@ -1,26 +1,165 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>Ruleta de la Fortuna</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Ruleta de Premios</title>
   <style>
-    body { font-family: Arial, sans-serif; text-align: center; }
-    #wheel { font-size: 50px; margin: 20px; }
+    body {
+      background: #0f0f0f;
+      color: #fff;
+      font-family: 'Segoe UI', sans-serif;
+      text-align: center;
+      padding: 30px;
+    }
+    .money {
+      margin-bottom: 20px;
+      font-size: 1.3rem;
+    }
+    #wheel {
+      margin: 30px auto;
+      width: 500px;
+      height: 500px;
+      border-radius: 50%;
+      transition: transform 4s ease-out;
+      transform: rotate(0deg);
+    }
+    .pointer {
+      width: 0;
+      height: 0;
+      border-left: 20px solid transparent;
+      border-right: 20px solid transparent;
+      border-bottom: 30px solid red;
+      position: relative;
+      top: -20px;
+      margin: auto;
+    }
+    button {
+      background-color: #fca311;
+      border: none;
+      padding: 10px 20px;
+      font-size: 1.1rem;
+      cursor: pointer;
+      border-radius: 5px;
+      margin-top: 10px;
+    }
+    .result {
+      margin-top: 20px;
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: green;
+    }
+    .highlight {
+      color: #ff0000;
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
   </style>
 </head>
 <body>
-  <h1>Ruleta de la Fortuna</h1>
-  <div id="wheel">🎁</div>
-  <p id="result">Haz clic en "Girar" para obtener un premio.</p>
-  <button onclick="spinWheel()">Girar</button>
+
+  <h1>🎡 Ruleta de Premios</h1>
+  <div class="money">Dinero disponible: <span id="money"></span> €</div>
+  <div class="pointer"></div>
+  <canvas id="wheel" width="500" height="500"></canvas>
+  <button id="spinBtn">Girar (100€)</button>
+  <div class="result" id="result"></div>
 
   <script>
-    const prizes = ['🎉', '💰', '🚗', '🏖️', '📱', '🎮'];
-    function spinWheel() {
-      const prize = prizes[Math.floor(Math.random() * prizes.length)];
-      document.getElementById('wheel').textContent = prize;
-      document.getElementById('result').textContent = `¡Ganaste ${prize}!`;
-    }
+    const canvas = document.getElementById("wheel");
+    const ctx = canvas.getContext("2d");
+    const prizes = [
+      { label: '0€', value: 0 },
+      { label: '150€', value: 150 },
+      { label: '300€', value: 300 },
+      { label: '0€', value: 0 },
+      { label: '600€', value: 600 },
+      { label: '1000€', value: 1000 },
+      { label: '50€', value: 50 },
+      { label: '0€', value: 0 },
+      { label: '200€', value: 200 },
+      { label: '500€', value: 500 },
+      { label: '750€', value: 750 },
+      { label: '0€', value: 0 },
+      { label: '100€', value: 100 },
+      { label: '1200€', value: 1200 },
+      { label: '0€', value: 0 },
+      { label: '300€', value: 300 },
+      { label: '0€', value: 0 },
+      { label: '250€', value: 250 },
+      { label: '400€', value: 400 },
+      { label: '900€', value: 900 }
+    ];
+
+    let money = parseInt(localStorage.getItem("money_ruleta")) || 2000;
+    document.getElementById("money").textContent = money;
+
+    const drawWheel = () => {
+      const numSectors = prizes.length;
+      const arc = 2 * Math.PI / numSectors;
+      const radius = canvas.width / 2;
+
+      for (let i = 0; i < numSectors; i++) {
+        const angle = i * arc;
+        ctx.beginPath();
+        ctx.fillStyle = i % 2 === 0 ? "#fca311" : "#ffd60a";
+        ctx.moveTo(radius, radius);
+        ctx.arc(radius, radius, radius, angle, angle + arc);
+        ctx.lineTo(radius, radius);
+        ctx.fill();
+
+        // Texto
+        ctx.save();
+        ctx.translate(radius, radius);
+        ctx.rotate(angle + arc / 2);
+        ctx.textAlign = "right";
+        ctx.fillStyle = "#000";
+        ctx.font = "bold 16px sans-serif";
+        ctx.fillText(prizes[i].label, radius - 10, 5);
+        ctx.restore();
+      }
+    };
+
+    drawWheel();
+
+    let currentRotation = 0;
+    let spinning = false;
+
+    document.getElementById("spinBtn").addEventListener("click", () => {
+      if (spinning) return;
+      if (money < 100) {
+        alert("No tienes suficiente dinero.");
+        return;
+      }
+
+      spinning = true;
+      money -= 100;
+
+      const randomIndex = Math.floor(Math.random() * prizes.length);
+      const arc = 360 / prizes.length;
+      const extraRotations = 5 * 360;
+      const finalRotation = extraRotations + (360 - randomIndex * arc - arc / 2);
+      currentRotation += finalRotation;
+
+      canvas.style.transform = `rotate(${currentRotation}deg)`;
+
+      setTimeout(() => {
+        const won = prizes[randomIndex].value;
+        money += won;
+        document.getElementById("money").textContent = money;
+        const resultText = `Ganaste ${won} € (${prizes[randomIndex].label})`;
+        document.getElementById("result").textContent = resultText;
+
+        // Resaltar el premio ganado en la ruleta
+        const highlightSector = document.createElement("div");
+        highlightSector.className = 'highlight';
+        highlightSector.textContent = resultText;
+        document.getElementById("result").appendChild(highlightSector);
+
+        localStorage.setItem("money_ruleta", money);
+        spinning = false;
+      }, 4000);
+    });
   </script>
 </body>
 </html>
